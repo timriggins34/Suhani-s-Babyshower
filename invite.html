@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Suhani's Baby Shower</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f3; /* Light green/grey tone */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden; /* Prevent scroll on touch devices while scratching */
+        }
+
+        .font-script {
+            font-family: 'Alex Brush', cursive;
+        }
+
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        #invite-container {
+            width: 100%;
+            max-width: 450px; /* Optimal mobile-like width */
+            height: 100vh;
+            max-height: 850px;
+            position: relative;
+            background-color: #fff;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        #base-layer {
+            background-image: url('Base_bg.jpg');
+            background-size: cover;
+            background-position: center;
+        }
+
+        canvas {
+            touch-action: none; /* Crucial for touch screens to prevent scrolling while scratching */
+        }
+
+        /* Fade out animation class */
+        .fade-out {
+            opacity: 0;
+            transition: opacity 1s ease-out;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="invite-container">
+        <!-- Base Layer (The Reveal) -->
+        <div id="base-layer" class="absolute inset-0 flex flex-col justify-center items-center text-center p-8 z-10">
+            <!-- Text container adjusted to fit inside the floral wreath -->
+            <div class="mt-8 px-4 py-6 text-[#2d4a36]">
+                <h1 class="font-script text-5xl mb-6 text-[#4a6b53]">Suhani's Baby Shower</h1>
+                
+                <div class="font-serif space-y-5">
+                    <div>
+                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">When</p>
+                        <p class="text-xl font-semibold">April 12th, Sunday</p>
+                        <p class="text-lg">12:00 PM</p>
+                    </div>
+
+                    <div>
+                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">Where</p>
+                        <p class="text-lg font-semibold">The Swinton House</p>
+                        <p class="text-md">B, 20, Gopinath Marg,<br>Jayanti Market, New Colony</p>
+                    </div>
+
+                    <div class="pt-4 border-t border-[#c5d3c9] w-3/4 mx-auto">
+                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">RSVP</p>
+                        <p class="text-md font-semibold">RSVP to XYZ</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scratch Canvas Layer -->
+        <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full z-20"></canvas>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('scratch-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const container = document.getElementById('invite-container');
+        
+        let isDrawing = false;
+        let isRevealed = false;
+
+        // Load the top layer image
+        const scratchImage = new Image();
+        scratchImage.src = 'Scratch_bg.jpg';
+        
+        // Initialize canvas once image loads
+        scratchImage.onload = () => {
+            initCanvas();
+        };
+
+        function initCanvas() {
+            // Set canvas pixel dimensions to match element size
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            // Draw image covering the whole canvas (object-fit: cover equivalent)
+            const scale = Math.max(canvas.width / scratchImage.width, canvas.height / scratchImage.height);
+            const x = (canvas.width / 2) - (scratchImage.width / 2) * scale;
+            const y = (canvas.height / 2) - (scratchImage.height / 2) * scale;
+            
+            ctx.drawImage(scratchImage, x, y, scratchImage.width * scale, scratchImage.height * scale);
+        }
+
+        // Handle window resize to avoid distortion
+        window.addEventListener('resize', () => {
+            if (!isRevealed) {
+                initCanvas();
+            }
+        });
+
+        // Get accurate coordinates
+        function getCoordinates(event) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (event.type.includes('touch')) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+
+            return {
+                x: clientX - rect.left,
+                y: clientY - rect.top
+            };
+        }
+
+        function scratch(event) {
+            if (!isDrawing || isRevealed) return;
+            event.preventDefault();
+
+            const { x, y } = getCoordinates(event);
+
+            // Use destination-out to make pixels transparent
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.beginPath();
+            ctx.arc(x, y, 35, 0, Math.PI * 2); // 35 is the radius of the scratch brush
+            ctx.fill();
+
+            checkReveal();
+        }
+
+        // Automatically reveal if sufficient area is scratched
+        function checkReveal() {
+            // Check less frequently to save performance (e.g., probability based)
+            if (Math.random() > 0.1) return; 
+
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const pixels = imageData.data;
+            let transparentPixels = 0;
+
+            // Check every 4th pixel for alpha value of 0 (transparent)
+            for (let i = 3; i < pixels.length; i += 4) {
+                if (pixels[i] === 0) {
+                    transparentPixels++;
+                }
+            }
+
+            const totalPixels = pixels.length / 4;
+            const percentScratched = (transparentPixels / totalPixels) * 100;
+
+            // If more than 40% is scratched, fade out the canvas
+            if (percentScratched > 40) {
+                isRevealed = true;
+                canvas.classList.add('fade-out');
+                
+                // Remove canvas from DOM after animation completes to free up interaction completely
+                setTimeout(() => {
+                    canvas.style.display = 'none';
+                }, 1000);
+            }
+        }
+
+        // Mouse Events
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            scratch(e);
+        });
+        canvas.addEventListener('mousemove', scratch);
+        window.addEventListener('mouseup', () => isDrawing = false);
+
+        // Touch Events
+        canvas.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            scratch(e);
+        });
+        canvas.addEventListener('touchmove', scratch);
+        window.addEventListener('touchend', () => isDrawing = false);
+
+    </script>
+</body>
+</html>
