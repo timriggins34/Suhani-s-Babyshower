@@ -36,7 +36,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: 'Base_bg.jpg';
+            background-image: url('Base_bg.png');
             background-size: cover;
             background-position: center;
             display: flex;
@@ -121,7 +121,7 @@
         const scratchImage = new Image();
         // Load image with Anonymous crossOrigin to attempt to allow pixel reading
         scratchImage.crossOrigin = "Anonymous"; 
-        scratchImage.src = 'Scratch_bg.jpg';
+        scratchImage.src = 'Scratch_bg.png';
 
         function resizeAndDrawCanvas() {
             canvas.width = container.offsetWidth;
