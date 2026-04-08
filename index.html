@@ -4,129 +4,163 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Suhani's Baby Shower</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,500&family=Cormorant+Garamond:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body {
-            background-color: #f4f6f3; /* Light green/grey tone */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #f4f1eb;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden; /* Prevent scroll on touch devices while scratching */
+            font-family: 'Cormorant Garamond', serif;
+            overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
         }
 
-        .font-script {
-            font-family: 'Alex Brush', cursive;
-        }
-
-        .font-serif {
-            font-family: 'Playfair Display', serif;
-        }
-
-        #invite-container {
-            width: 100%;
-            max-width: 450px; /* Optimal mobile-like width */
-            height: 100vh;
-            max-height: 850px;
+        #card-container {
             position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: 90vh; /* Fallback height */
+            min-height: 500px;
+            max-height: 800px;
+            aspect-ratio: 9 / 16;
+            flex-shrink: 0; /* Prevent flexbox collapse */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
             background-color: #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
         #base-layer {
-            background-image: url('Base_bg.jpg');
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('Base_bg.png');
             background-size: cover;
             background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20%;
+            box-sizing: border-box;
+            color: #4a5c48; /* Dark olive green to match foliage */
         }
 
-        canvas {
-            touch-action: none; /* Crucial for touch screens to prevent scrolling while scratching */
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin: 0 0 15px 0;
+            line-height: 1.1;
+            color: #3b4938;
         }
 
-        /* Fade out animation class */
-        .fade-out {
-            opacity: 0;
-            transition: opacity 1s ease-out;
-            pointer-events: none;
+        .date, .time {
+            font-size: 1.3rem;
+            margin: 5px 0;
+            font-weight: 600;
+        }
+
+        .venue {
+            margin: 15px 0;
+            font-size: 1.1rem;
+            line-height: 1.4;
+        }
+
+        .rsvp {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-style: italic;
+            font-weight: 600;
+        }
+
+        #scratch-pad {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            cursor: pointer;
+        }
+
+        /* Adjustments for smaller screens */
+        @media (max-width: 400px) {
+            h1 { font-size: 1.8rem; }
+            .date, .time { font-size: 1.1rem; }
+            .venue { font-size: 1rem; }
+            #base-layer { padding: 15%; }
         }
     </style>
 </head>
 <body>
 
-    <div id="invite-container">
-        <!-- Base Layer (The Reveal) -->
-        <div id="base-layer" class="absolute inset-0 flex flex-col justify-center items-center text-center p-8 z-10">
-            <!-- Text container adjusted to fit inside the floral wreath -->
-            <div class="mt-8 px-4 py-6 text-[#2d4a36]">
-                <h1 class="font-script text-5xl mb-6 text-[#4a6b53]">Suhani's Baby Shower</h1>
-                
-                <div class="font-serif space-y-5">
-                    <div>
-                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">When</p>
-                        <p class="text-xl font-semibold">April 12th, Sunday</p>
-                        <p class="text-lg">12:00 PM</p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">Where</p>
-                        <p class="text-lg font-semibold">The Swinton House</p>
-                        <p class="text-md">B, 20, Gopinath Marg,<br>Jayanti Market, New Colony</p>
-                    </div>
-
-                    <div class="pt-4 border-t border-[#c5d3c9] w-3/4 mx-auto">
-                        <p class="text-sm tracking-widest uppercase text-[#5a7b63] mb-1">RSVP</p>
-                        <p class="text-md font-semibold">RSVP to XYZ</p>
-                    </div>
-                </div>
-            </div>
+    <div id="card-container">
+        <div id="base-layer">
+            <h1>Suhani's<br>Baby Shower</h1>
+            <div class="date">April 12th, Sunday</div>
+            <div class="time">12:00 pm</div>
+            <div class="venue">The Swinton House<br>B, 20, Gopinath Marg,<br>Jayanti Market, New Colony</div>
+            <div class="rsvp">RSVP to XYZ</div>
         </div>
-
-        <!-- Scratch Canvas Layer -->
-        <canvas id="scratch-canvas" class="absolute inset-0 w-full h-full z-20"></canvas>
+        <canvas id="scratch-pad"></canvas>
     </div>
 
     <script>
-        const canvas = document.getElementById('scratch-canvas');
+        const canvas = document.getElementById('scratch-pad');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const container = document.getElementById('invite-container');
-        
+        const container = document.getElementById('card-container');
+
         let isDrawing = false;
-        let isRevealed = false;
+        let brushSize = 40;
+        let scratchCount = 0;
+        let corsErrorDetected = false;
 
-        // Load the top layer image
         const scratchImage = new Image();
-        scratchImage.src = 'Scratch_bg.jpg';
-        
-        // Initialize canvas once image loads
-        scratchImage.onload = () => {
-            initCanvas();
-        };
+        // Removed crossOrigin declaration to prevent image load failure 
+        // in environments without explicit CORS headers.
+        scratchImage.src = 'Scratch_bg.png';
 
-        function initCanvas() {
-            // Set canvas pixel dimensions to match element size
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-
-            // Draw image covering the whole canvas (object-fit: cover equivalent)
-            const scale = Math.max(canvas.width / scratchImage.width, canvas.height / scratchImage.height);
-            const x = (canvas.width / 2) - (scratchImage.width / 2) * scale;
-            const y = (canvas.height / 2) - (scratchImage.height / 2) * scale;
+        function resizeAndDrawCanvas() {
+            canvas.width = container.offsetWidth;
+            canvas.height = container.offsetHeight;
             
-            ctx.drawImage(scratchImage, x, y, scratchImage.width * scale, scratchImage.height * scale);
+            // Re-draw image if loaded, adjusting scale to cover canvas
+            if (scratchImage.complete && scratchImage.naturalHeight !== 0) {
+                drawCoverImage();
+            }
         }
 
-        // Handle window resize to avoid distortion
-        window.addEventListener('resize', () => {
-            if (!isRevealed) {
-                initCanvas();
-            }
-        });
+        function drawCoverImage() {
+            // Calculate aspect ratio to ensure image covers the canvas properly (object-fit: cover equivalent)
+            const canvasRatio = canvas.width / canvas.height;
+            const imgRatio = scratchImage.width / scratchImage.height;
+            let drawWidth = canvas.width;
+            let drawHeight = canvas.height;
+            let offsetX = 0;
+            let offsetY = 0;
 
-        // Get accurate coordinates
+            if (canvasRatio > imgRatio) {
+                drawHeight = canvas.width / imgRatio;
+                offsetY = (canvas.height - drawHeight) / 2;
+            } else {
+                drawWidth = canvas.height * imgRatio;
+                offsetX = (canvas.width - drawWidth) / 2;
+            }
+
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(scratchImage, offsetX, offsetY, drawWidth, drawHeight);
+        }
+
+        scratchImage.onload = resizeAndDrawCanvas;
+        window.addEventListener('resize', resizeAndDrawCanvas);
+
         function getCoordinates(event) {
             const rect = canvas.getBoundingClientRect();
             let clientX, clientY;
@@ -145,67 +179,82 @@
             };
         }
 
+        function startDrawing(event) {
+            isDrawing = true;
+            scratch(event);
+        }
+
+        function stopDrawing() {
+            if (!isDrawing) return;
+            isDrawing = false;
+            checkRevealStatus();
+        }
+
         function scratch(event) {
-            if (!isDrawing || isRevealed) return;
+            if (!isDrawing) return;
             event.preventDefault();
 
             const { x, y } = getCoordinates(event);
 
-            // Use destination-out to make pixels transparent
             ctx.globalCompositeOperation = 'destination-out';
             ctx.beginPath();
-            ctx.arc(x, y, 35, 0, Math.PI * 2); // 35 is the radius of the scratch brush
+            ctx.arc(x, y, brushSize, 0, Math.PI * 2);
             ctx.fill();
 
-            checkReveal();
+            // Fallback tracking if pixel reading is blocked
+            scratchCount++;
+            if (corsErrorDetected && scratchCount > 100) {
+                revealFullImage();
+            }
         }
 
-        // Automatically reveal if sufficient area is scratched
-        function checkReveal() {
-            // Check less frequently to save performance (e.g., probability based)
-            if (Math.random() > 0.1) return; 
+        function checkRevealStatus() {
+            if (corsErrorDetected) return;
 
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            const pixels = imageData.data;
-            let transparentPixels = 0;
+            try {
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+                let transparentPixels = 0;
 
-            // Check every 4th pixel for alpha value of 0 (transparent)
-            for (let i = 3; i < pixels.length; i += 4) {
-                if (pixels[i] === 0) {
-                    transparentPixels++;
+                // Check alpha channel (every 4th value)
+                for (let i = 3; i < pixels.length; i += 4) {
+                    if (pixels[i] === 0) {
+                        transparentPixels++;
+                    }
                 }
-            }
 
-            const totalPixels = pixels.length / 4;
-            const percentScratched = (transparentPixels / totalPixels) * 100;
+                const totalPixels = pixels.length / 4;
+                const percentTransparent = (transparentPixels / totalPixels) * 100;
 
-            // If more than 40% is scratched, fade out the canvas
-            if (percentScratched > 40) {
-                isRevealed = true;
-                canvas.classList.add('fade-out');
-                
-                // Remove canvas from DOM after animation completes to free up interaction completely
-                setTimeout(() => {
-                    canvas.style.display = 'none';
-                }, 1000);
+                // Auto-reveal when 45% of the card is scratched
+                if (percentTransparent > 45) {
+                    revealFullImage();
+                }
+            } catch (e) {
+                // Occurs if running locally without a web server (file:// protocol) due to CORS
+                corsErrorDetected = true;
             }
+        }
+
+        function revealFullImage() {
+            canvas.style.transition = 'opacity 0.6s ease-out';
+            canvas.style.opacity = '0';
+            setTimeout(() => {
+                canvas.style.pointerEvents = 'none';
+            }, 600);
         }
 
         // Mouse Events
-        canvas.addEventListener('mousedown', (e) => {
-            isDrawing = true;
-            scratch(e);
-        });
+        canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', scratch);
-        window.addEventListener('mouseup', () => isDrawing = false);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseleave', stopDrawing);
 
         // Touch Events
-        canvas.addEventListener('touchstart', (e) => {
-            isDrawing = true;
-            scratch(e);
-        });
-        canvas.addEventListener('touchmove', scratch);
-        window.addEventListener('touchend', () => isDrawing = false);
+        canvas.addEventListener('touchstart', startDrawing, { passive: false });
+        canvas.addEventListener('touchmove', scratch, { passive: false });
+        canvas.addEventListener('touchend', stopDrawing);
+        canvas.addEventListener('touchcancel', stopDrawing);
 
     </script>
 </body>
