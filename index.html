@@ -17,18 +17,18 @@
             justify-content: center;
             align-items: center;
             font-family: 'Cormorant Garamond', serif;
-            overscroll-behavior: none; /* Prevents pull-to-refresh on mobile */
+            overscroll-behavior: none; 
         }
 
         #card-container {
             position: relative;
             width: 100%;
             max-width: 450px;
-            height: 90vh; /* Fallback height */
+            height: 90vh; 
             min-height: 500px;
             max-height: 800px;
             aspect-ratio: 9 / 16;
-            flex-shrink: 0; /* Prevent flexbox collapse */
+            flex-shrink: 0; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
             background-color: #fff;
@@ -50,7 +50,8 @@
             text-align: center;
             padding: 20%;
             box-sizing: border-box;
-            color: #4a5c48; /* Dark olive green to match foliage */
+            color: #4a5c48; 
+            opacity: 0; /* Hidden initially to prevent early reveal */
         }
 
         h1 {
@@ -90,7 +91,6 @@
             cursor: pointer;
         }
 
-        /* Adjustments for smaller screens */
         @media (max-width: 400px) {
             h1 { font-size: 1.8rem; }
             .date, .time { font-size: 1.1rem; }
@@ -116,6 +116,7 @@
         const canvas = document.getElementById('scratch-pad');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const container = document.getElementById('card-container');
+        const baseLayer = document.getElementById('base-layer');
 
         let isDrawing = false;
         let brushSize = 40;
@@ -123,22 +124,20 @@
         let corsErrorDetected = false;
 
         const scratchImage = new Image();
-        // Removed crossOrigin declaration to prevent image load failure 
-        // in environments without explicit CORS headers.
         scratchImage.src = 'Scratch_bg.png';
 
         function resizeAndDrawCanvas() {
             canvas.width = container.offsetWidth;
             canvas.height = container.offsetHeight;
             
-            // Re-draw image if loaded, adjusting scale to cover canvas
             if (scratchImage.complete && scratchImage.naturalHeight !== 0) {
                 drawCoverImage();
+                // Reveal base layer only after the canvas has been drawn over it
+                baseLayer.style.opacity = '1';
             }
         }
 
         function drawCoverImage() {
-            // Calculate aspect ratio to ensure image covers the canvas properly (object-fit: cover equivalent)
             const canvasRatio = canvas.width / canvas.height;
             const imgRatio = scratchImage.width / scratchImage.height;
             let drawWidth = canvas.width;
@@ -201,7 +200,6 @@
             ctx.arc(x, y, brushSize, 0, Math.PI * 2);
             ctx.fill();
 
-            // Fallback tracking if pixel reading is blocked
             scratchCount++;
             if (corsErrorDetected && scratchCount > 100) {
                 revealFullImage();
@@ -216,7 +214,6 @@
                 const pixels = imageData.data;
                 let transparentPixels = 0;
 
-                // Check alpha channel (every 4th value)
                 for (let i = 3; i < pixels.length; i += 4) {
                     if (pixels[i] === 0) {
                         transparentPixels++;
@@ -226,12 +223,10 @@
                 const totalPixels = pixels.length / 4;
                 const percentTransparent = (transparentPixels / totalPixels) * 100;
 
-                // Auto-reveal when 45% of the card is scratched
                 if (percentTransparent > 45) {
                     revealFullImage();
                 }
             } catch (e) {
-                // Occurs if running locally without a web server (file:// protocol) due to CORS
                 corsErrorDetected = true;
             }
         }
@@ -244,13 +239,11 @@
             }, 600);
         }
 
-        // Mouse Events
         canvas.addEventListener('mousedown', startDrawing);
         canvas.addEventListener('mousemove', scratch);
         canvas.addEventListener('mouseup', stopDrawing);
         canvas.addEventListener('mouseleave', stopDrawing);
 
-        // Touch Events
         canvas.addEventListener('touchstart', startDrawing, { passive: false });
         canvas.addEventListener('touchmove', scratch, { passive: false });
         canvas.addEventListener('touchend', stopDrawing);
