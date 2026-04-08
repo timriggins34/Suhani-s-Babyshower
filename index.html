@@ -24,7 +24,11 @@
             position: relative;
             width: 100%;
             max-width: 450px;
+            height: 90vh; /* Fallback height */
+            min-height: 500px;
+            max-height: 800px;
             aspect-ratio: 9 / 16;
+            flex-shrink: 0; /* Prevent flexbox collapse */
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             overflow: hidden;
             background-color: #fff;
@@ -119,8 +123,8 @@
         let corsErrorDetected = false;
 
         const scratchImage = new Image();
-        // Load image with Anonymous crossOrigin to attempt to allow pixel reading
-        scratchImage.crossOrigin = "Anonymous"; 
+        // Removed crossOrigin declaration to prevent image load failure 
+        // in environments without explicit CORS headers.
         scratchImage.src = 'Scratch_bg.png';
 
         function resizeAndDrawCanvas() {
